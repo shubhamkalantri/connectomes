@@ -115,38 +115,26 @@ def WeightedFunctional():
     path = "./Task1Data/tractor/functional/data.nii.gz"
     obj = nib.load(path)
     data = obj.get_fdata()
-
-    lut = parse_lut("./Task1Data/tractor/functional/parcellation.lut")
-    parcellation_attrib = {l[0]: l[1:] for l in lut}
-    parcellation = nib.load(
-        "./Task1Data/tractor/functional/parcellation.nii.gz"
-    ).get_fdata()
+    parcellation = nib.load("./Task1Data/tractor/functional/parcellation.nii.gz").get_fdata()
 
     print(data.shape)
-
     data[np.isnan(data)] = 0
-
     plt.figure(figsize=(30, 30))
-    plt.suptitle("FA mapped slices at different thresholds")
 
-    s = 17
-    for i in range(4):
-        d = data[:, :, s, i].copy()
 
-        color_coded = np.zeros((d.shape[0], d.shape[1], 3))
-        for x in range(d.shape[0]):
-            for y in range(d.shape[1]):
-                parcel = int(parcellation[x, y, s])
-                if parcel in parcellation_attrib:
-                    color_coded[x, y] = hex_to_rgb(parcellation_attrib[parcel][2])
+    d = data[:, :, :, :].copy()
+    parcels = np.unique(parcellation).astype(int)
 
-        plt.subplot(2, 4, i * 2 + 1), plt.imshow(d, cmap="grey")
-        plt.subplot(2, 4, i * 2 + 2), plt.imshow(color_coded)
+    regions = {}
 
-    plt.show()
+    for parcel in parcels:
+        mask = parcellation == parcel
+        parcel_avg_series = np.mean(d[mask, :], axis=0)
+        regions[parcel] = parcel_avg_series
 
+    print(regions)
 
 if __name__ == "__main__":
-    # Main()
-    # BCT()
+    #Main()
+    #BCT()
     WeightedFunctional()
