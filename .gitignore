@@ -32,4 +32,7 @@ result*
 __pycache__
 *.m
 .DS_Store
+**/.DS_Store
+*.nii.gz
+**/*.nii.gz
 
