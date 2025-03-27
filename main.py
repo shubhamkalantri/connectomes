@@ -4,6 +4,8 @@ import bct
 import matplotlib
 import nibabel as nib
 import numpy as np
+import seaborn as sns
+
 
 matplotlib.use("QtAgg")
 
@@ -121,18 +123,20 @@ def WeightedFunctional():
     data[np.isnan(data)] = 0
     plt.figure(figsize=(30, 30))
 
-
     d = data[:, :, :, :].copy()
     parcels = np.unique(parcellation).astype(int)
 
-    regions = {}
-
-    for parcel in parcels:
+    regions = np.zeros((len(parcels), data.shape[-1]))
+    for idx, parcel in enumerate(parcels):
         mask = parcellation == parcel
         parcel_avg_series = np.mean(d[mask, :], axis=0)
-        regions[parcel] = parcel_avg_series
+        regions[idx, :] = parcel_avg_series
 
-    print(regions)
+    r = corshrink(regions.T, 0.5)
+    print(r)
+
+    axis_corr = sns.heatmap(r, vmin=-1, vmax=1, center=0, square=True, cmap='coolwarm')
+    plt.show()
 
 if __name__ == "__main__":
     #Main()
